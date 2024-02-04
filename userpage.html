@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+</head>
+<body>
+    <h2>User:</h2>
+    <label for=name>Name:</label>
+    <span id="name"></span>
+    <br/>
+    <label for=username>Username:</label>
+    <span id="username"></span>
+    <br/>
+    <label for="email">Email:</label>
+    <span id="email"></span>
+    <br/>
+    <a href="/mywebapp/friends.html">Friends</a>
+    <a href="/mywebapp/subscribers.html">Subscribers</a>
+    <a href="/mywebapp/feeds.html">Feeds</a>
+    <a href="/mywebapp/people.html">People</a>
+    <button type="button" onclick="logout()">Logout</button>
+
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        // Inject user data extracted from jwt token
+        document.getElementById("name").innerHTML = jsonTokenData.name;
+        document.getElementById("username").innerHTML = jsonTokenData.username;
+        document.getElementById("email").innerHTML = jsonTokenData.email;
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+
+        function logout() {
+            deleteCookie('jwt');
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends Page</title>
+</head>
+<body>
+    <h2>Friends:</h2>
+    <div id="friends-container"></div>
+    <h2>Subscriptions:</h2>
+    <div id="subscriptions-container"></div>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        async function getFriends() {
+            const response = await fetch('http://localhost:7070/api/friendships', {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let friendsData = data;
+                createFriends(friendsData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+ 
+		function readCookie(name) {
+			var matches = document.cookie.match(new RegExp(
+				"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+  		    return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // Build an friends page from friends JSON
+        function createFriends(friendsData) {
+            const friendsContainer = document.getElementById('friends-container');
+            const subscriptionsContainer = document.getElementById('subscriptions-container');
+
+            friendsData.forEach(friendship => {
+                let subscriberId = friendship.subscriber.personId;
+
+                let receiver = friendship.receiver;
+                let subscriber = friendship.subscriber;
+
+                if(friendship.friendshipStatus == 'FRIEND') {
+                    const friendContainer = document.createElement('a');
+                                
+                    let friendElement = document.createElement('div');
+
+                    // check if current user is a subscriber or receiver of friendship                
+                    if(receiver.name !== jsonTokenData.name) {
+                        friendContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&friendship_id="+friendship.friendshipId;
+                        friendElement.textContent = receiver.name;
+                    } else {
+                        friendContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&friendship_id="+friendship.friendshipId;
+                        friendElement.textContent = subscriber.name;
+                    }
+                    friendContainer.appendChild(friendElement);
+                    friendsContainer.appendChild(friendContainer);
+                } else { 
+                    const subscriberContainer = document.createElement('a');
+                    let subscriberElement = document.createElement('div');
+
+                    if(receiver.name !== jsonTokenData.name) {
+                        subscriberContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&subscription_id="+friendship.friendshipId;
+                        subscriberElement.textContent = receiver.name;
+                    }
+
+                    subscriberContainer.appendChild(subscriberElement);
+                    subscriptionsContainer.appendChild(subscriberContainer);
+                }
+                
+            });
+        
+        }
+
+        
+        getFriends();
+    </script>
+</body>
+</html>

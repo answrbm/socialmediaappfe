@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <div id="error" style="color:red"></div>
+        <button type="button" onclick="login()">Login</button>
+        <a href="/mywebapp/registration.html">Registration</a>
+    </form>
+
+    <script>
+        let jwt = readCookie('jwt');
+        if(jwt != undefined) {
+            const jsonTokenData = parseJwt(jwt);
+            let currentTime = new Date().getTime();
+            if(jsonTokenData.exp * 1000 <= currentTime) {
+                document.getElementById('error').innerHTML = "Relogin please";
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // login
+            const response = await fetch('http://localhost:7070/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            // throw an error if data is invalid
+            if (!response.ok) {
+                const data = await response.json();
+                document.getElementById('error').innerHTML = data.error;
+            }
+
+            // extract token json from response
+            const token = await response.json();
+
+            // Save jwt token in cookies
+            document.cookie = `jwt=${token.jwt_token}; path=/`;
+
+            // Redirect to user page
+            if (response.ok) {
+                window.location.href = 'http://localhost:8080/mywebapp/userpage.html';
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse(atob(base64));
+        }
+ 
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+    </script>
+</body>
+</html>

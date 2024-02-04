@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Page</title>
+</head>
+<body>
+    <h2>People:</h2>
+    <div id="people-container"></div>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        getPeople();
+
+        async function getPeople() {
+            const response = await fetch('http://localhost:7070/api/people', {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let peopleData = data;
+                createPeople(peopleData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+ 
+		function readCookie(name) {
+			var matches = document.cookie.match(new RegExp(
+				"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+  		    return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // Build a people page from people JSON
+        function createPeople(peopleData) {
+            const peopleContainer = document.getElementById('people-container');
+
+            peopleData.forEach(person => {
+                const personContainer = document.createElement('a');
+                if(person.personId != jsonTokenData.personId) {
+                                
+                    let personElement = document.createElement('div');
+                    personElement.textContent = person.name;
+
+                    personContainer.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+person.personId;
+
+                    personContainer.appendChild(personElement);
+                    peopleContainer.appendChild(personContainer);
+                }
+            });
+        
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend Page</title>
+</head>
+<body>
+    <h2>Friend:</h2>
+    <div id="friend-container"></div>
+    <a href="/mywebapp/userpage.html">My page</a>
+    <br/>
+    <a id="userposts_reference">User posts</a>
+    <br/>
+    <a id="chat_reference">Chat with a user</a>
+    <button id="friendshipButton" onclick="cancelFriendship()">Cancel friendship</button>
+    <button id="subscriptionButton" onclick="cancelSubscription()">Cancel subscription</button>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+        // Получение параметра "tag" из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const friendId = urlParams.get('friend_id');
+        const friendshipId = urlParams.get('friendship_id');
+        const subscriptionId = urlParams.get('subscription_id');
+
+        let friendshipButton = document.getElementById('friendshipButton');
+        let subscriptionButton = document.getElementById('subscriptionButton');
+        if(friendshipId != undefined) {
+            friendshipButton.style.display = 'block';
+            subscriptionButton.style.display = 'none';
+        } else {
+            friendshipButton.style.display = 'none';
+            subscriptionButton.style.display = 'block';
+        }
+
+        const url = 'http://localhost:7070/api/people/'+friendId;
+        let chatRef = document.getElementById("chat_reference");
+        let postsRef = document.getElementById("userposts_reference");
+        postsRef.href = "http://localhost:7070/api/posts?personId="+friendId;
+        getFriend();
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse(atob(base64));
+        }
+
+        // Get friend from server
+        async function getFriend() {
+          try {
+            let jwt = readCookie('jwt');
+
+            responseFriendName = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let friendData = data;
+                buildFriend(friendData);
+                chatRef.href = "/mywebapp/chat.html?friend_id="+friendId+"&user="+friendData.name;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            
+          } catch (error) {
+                console.error('Error:', error);
+                return null; // Возвращайте что-то, что указывает на ошибку или неудачу
+          }
+        }
+
+        async function cancelFriendship() {
+            let url = 'http://localhost:7070/api/friendships?friendshipId=';
+            if(friendshipId != undefined) {
+                url += friendshipId;
+            } else {
+                url += subscriptionId;
+            }
+            responseFriendName = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                } else {
+                    window.location.href = '/mywebapp/subscribers.html';
+                }
+            });
+        }
+
+        async function cancelSubscription() {
+            let url = 'http://localhost:7070/api/friendships?friendshipId=';
+            if(friendshipId != undefined) {
+                url += friendshipId;
+            } else {
+                url += subscriptionId;
+            }
+            responseFriendName = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                } else {
+                    window.location.href = '/mywebapp/friends.html';
+                }
+            });
+        }
+ 
+        // Read a jwt token
+		function readCookie(cookieName) {
+			var matches = document.cookie.match(new RegExp(
+				"(?:^|; )" + cookieName.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  		    ));
+  		    return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        function capitalizeFirstLetter(originalString) {
+            let letters = originalString.split("");
+            letters[0] = letters[0].toUpperCase();
+            return letters.join('');
+        }
+
+        // Build an friend page from friend JSON
+        function buildFriend(data) {
+            const friendContainer = document.getElementById('friend-container');
+
+            for (const [key, value] of Object.entries(data)) {
+                if(key !== 'personId') {
+                    let friendElement = document.createElement('div');
+
+                    friendElement.textContent = capitalizeFirstLetter(key) + ": " + value; 
+                    friendContainer.appendChild(friendElement);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

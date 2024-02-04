@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Page</title>
+</head>
+<body>
+    <h2 id="chat_with"></h2>
+    <div id="chat-container"></div>
+    <form id="message_form" method="POST">
+        <label for="message">Enter your message:</label>
+        <textarea id="message" name="message" rows="4" cols="50"></textarea>
+        <br/>
+        <input type="submit" value="Send" onclick="sendMessage()"/>
+    </form>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        // Получение параметра "tag" из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const friendId = urlParams.get('friend_id');
+        const friendName = urlParams.get('user');
+        const urlChat = 'http://localhost:7070/api/messages/chat?personId='+friendId;
+        document.getElementById('chat_with').textContent = "Chat with " + friendName;
+        const urlForm = "http://localhost:7070/api/messages?personId="+friendId;
+
+        getMessages();
+
+        async function getMessages() {
+
+            let jwt = readCookie('jwt');
+
+            const response = await fetch(urlChat, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let chatData = data;
+                createChat(chatData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+
+		let jwt = readCookie('jwt');
+		const decodedToken = parseJwt(jwt);
+		// console.log(decodedToken);
+ 
+		function readCookie(name) {
+			var matches = document.cookie.match(new RegExp(
+				"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  		));
+  		    return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        function createChat(data) {
+            const chatContainer = document.getElementById('chat-container');
+
+            data.forEach(messageItem => {
+                                               
+                let contentElement = document.createElement('div');   
+                let br = document.createElement('br');            
+                contentElement.textContent = messageItem.sender.name + ": " + messageItem.content + " " + messageItem.sentAt;
+    
+                chatContainer.appendChild(contentElement);
+                chatContainer.appendChild(br);
+            });
+        
+        }
+
+        async function sendMessage() {
+            let content = document.getElementById('message').value;
+
+            let jwt = readCookie('jwt');
+            console.log(jwt);
+
+            const response = await fetch(urlForm, {
+                method: 'POST',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            });
+
+            if(response.ok) {
+                window.location.href = '/mywebapp/chat.html';
+            }
+        }
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person Page</title>
+</head>
+<body>
+    <h2>Person:</h2>
+    <label for=name>Name:</label>
+    <span id="name"></span>
+    <br/>
+    <label for=username>Username:</label>
+    <span id="username"></span>
+    <br/>
+    <label for="email">Email:</label>
+    <span id="email"></span>
+    <br/>
+    <button id="subscriptionButton" onclick="subscribe()">Subscribe</button>
+    <button id="acceptFriendshipButton" onclick="acceptFriendship()">Accept friendship</button>
+    <button id="cancelFriendshipButton" onclick="cancelFriendshipOrSubscription()">Cancel friendship</button>
+    <button id="cancelSubscriptionButton" onclick="cancelFriendshipOrSubscription()">Cancel subscription</button>
+    <br/>
+    <a id="userposts_reference">User posts</a>
+    <br/>
+    <a href="/mywebapp/userpage.html">User page</a>
+
+    <script>
+        // Получение параметра "tag" из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const personId = urlParams.get('person_id');
+        const subscriptionId = urlParams.get('subscription_id');
+        let foundFriendshipId = "";
+
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        let postsRef = document.getElementById("userposts_reference");
+        postsRef.href = "http://localhost:8080/mywebapp/userposts.html?personId="+personId;
+
+        let subscriptionButton = document.getElementById("subscriptionButton");
+        let acceptFriendshipButton = document.getElementById("acceptFriendshipButton");
+        let cancelSubscriptionButton = document.getElementById("cancelSubscriptionButton");
+        let cancelFriendshipButton = document.getElementById("cancelFriendshipButton");
+        if(subscriptionId != undefined) {
+            subscriptionButton.style.display = 'block';
+            acceptFriendshipButton.style.display = 'none';
+        } else {
+            subscriptionButton.style.display = 'none';
+            acceptFriendshipButton.style.display = 'block';
+        }
+        getPerson();
+        getFriendship();
+
+        async function getPerson() {
+
+            const response = await fetch('http://localhost:7070/api/people/'+personId, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let personData = data;
+                buildPerson(personData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        async function getFriendship() {
+
+            const response = await fetch('http://localhost:7070/api/friendships/people?personId='
+                +personId, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error();
+                }
+                return response.json();
+            })
+            .then(data => {    
+                foundFriendshipId = data.friendshipId; 
+                if(data.subscriber.name == jsonTokenData.name) {
+                    if(data.friendshipStatus == 'FRIEND') {
+                        cancelFriendshipButton.style.display = 'block';
+                        cancelSubscriptionButton.style.display = 'none';
+                    } else {
+                        cancelFriendshipButton.style.display = 'none';
+                        cancelSubscriptionButton.style.display = 'block';
+                    }
+                    subscriptionButton.style.display = 'none';
+                    acceptFriendshipButton.style.display = 'none';
+                }
+                if(data.receiver.name == jsonTokenData.name ) {
+                    if(data.friendshipStatus == 'FRIEND') {
+                        acceptFriendshipButton.style.display = 'none';
+                        cancelFriendshipButton.style.display = 'block';
+                    } else {
+                        acceptFriendshipButton.style.display = 'block';
+                        cancelFriendshipButton.style.display = 'none';
+                    }
+                    subscriptionButton.style.display = 'none';
+                    cancelSubscriptionButton.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                cancelFriendshipButton.style.display = 'none';
+                cancelSubscriptionButton.style.display = 'none';
+                subscriptionButton.style.display = 'block';
+                acceptFriendshipButton.style.display = 'none';
+            });
+        }
+
+
+
+        async function acceptFriendship() {
+            let url = "http://localhost:7070/api/friendships?friendshipId=";
+            if(subscriptionId != undefined) {
+                url += subscriptionId;
+            } else {
+                url += foundFriendshipId;
+            }
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                if(response.ok) {
+                    window.location.href = '/mywebapp/friends.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        async function subscribe() {
+            const response = await fetch('http://localhost:7070/api/friendships?personId='+personId, {
+                method: 'POST',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                if(response.ok) {
+                    window.location.href = '/mywebapp/friends.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        async function cancelFriendshipOrSubscription() {
+            let url = "http://localhost:7070/api/friendships?friendshipId=";
+            if(subscriptionId != undefined) {
+                url += subscriptionId;
+            } else {
+                url += foundFriendshipId;
+            }
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                if(response.ok) {
+                    window.location.href = '/mywebapp/friends.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+
+
+        // Build an friend page from friend JSON
+        function buildPerson(data) {
+            const personContainer = document.getElementById('friend-container');
+
+            for (const [key, value] of Object.entries(data)) {
+                if(key !== 'personId') {
+                    // Inject user data extracted from response
+                    if(key == 'name') document.getElementById("name").innerHTML = value;
+                    if(key == 'username') document.getElementById("username").innerHTML = value;
+                    if(key == 'email') document.getElementById("email").innerHTML = value;
+                }
+            }
+        }
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+    </script>
+</body>
+</html>

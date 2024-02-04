@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribers Page</title>
+</head>
+<body>
+    <h2>Subscribers:</h2>
+    <div id="subscribers-container"></div>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        getSubscribers();
+
+        async function getSubscribers() {
+            const response = await fetch('http://localhost:7070/api/friendships', {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let friendsData = data;
+                createSubscribers(friendsData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+    		const base64Url = token.split('.')[1];
+    		const base64 = base64Url.replace('-', '+').replace('_', '/');
+    		return JSON.parse(atob(base64));
+		}
+ 
+		function readCookie(name) {
+			var matches = document.cookie.match(new RegExp(
+				"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+  		    return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // Build an friends page from friends JSON
+        function createSubscribers(friendsData) {
+            const subscribersContainer = document.getElementById('subscribers-container');
+
+            friendsData.forEach(friendship => {
+                if(friendship.friendshipStatus == 'SUBSCRIBER' && friendship.receiver.name == jsonTokenData.name) {
+                    const subscriberContainer = document.createElement('a');
+                    let subscriber = friendship.subscriber;
+                                
+                    let subscriberElement = document.createElement('div');
+              
+                    subscriberContainer.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+subscriber.personId+
+                    "&subscription_id="+friendship.friendshipId;
+                    subscriberElement.textContent = subscriber.name;
+
+                    subscriberContainer.appendChild(subscriberElement);
+                    subscribersContainer.appendChild(subscriberContainer);
+                }
+            });
+        }
+
+
+    </script>
+</body>
+</html>

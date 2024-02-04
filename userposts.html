@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users posts page</title>
+</head>
+<body>
+    <h2>Posts:</h2>
+    <div id="posts-container"></div>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const personId = urlParams.get('personId');
+
+        getPosts();
+
+        async function getPosts() {
+            const response = await fetch('http://localhost:7070/api/posts/'+personId, {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let postsData = data;
+                createPosts(postsData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse(atob(base64));
+        }
+ 
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // Build an friends page from friends JSON
+        function createPosts(postsData) {
+            const postsContainer = document.getElementById('posts-container');
+
+            postsData.forEach(post => {  
+                let creator = post.creator;
+                                
+                let postTitle = document.createElement('div');
+                let postDescription = document.createElement('div');
+                let postCreator = document.createElement('a');
+                postCreator.textContent = creator.name;
+                
+                if(creator.personId != jsonTokenData.personId) {
+                    postCreator.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+creator.personId;
+                } else {
+                    postCreator.href = '/mywebapp/userpage.html';
+                }
+                postTitle.textContent = post.title + " " + post.createdAt;
+                postDescription.textContent = post.description;
+
+                postsContainer.appendChild(postCreator);
+                postsContainer.appendChild(postTitle);
+                postsContainer.appendChild(postDescription);
+            });
+        
+        }
+    </script>
+</body>
+</html>

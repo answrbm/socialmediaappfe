@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feeds Page</title>
+</head>
+<body>
+    <h2>Feeds:</h2>
+    <div id="feeds-container"></div>
+    <a href="/mywebapp/userpage.html">User page</a>
+    <script>
+        let jwt = readCookie('jwt');
+        const jsonTokenData = parseJwt(jwt);
+        let currentTime = new Date().getTime();
+        if(jsonTokenData.exp * 1000 <= currentTime) {
+            window.location.href = '/mywebapp/login.html';
+        }
+
+        getFeeds();
+
+        async function getFeeds() {
+            const response = await fetch('http://localhost:7070/api/feeds', {
+                method: 'GET',
+                headers: {
+                    'Authorization' : 'Bearer '+jwt,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let feedsData = data;
+                createFeeds(feedsData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse(atob(base64));
+        }
+ 
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // Build an friends page from friends JSON
+        function createFeeds(feedsData) {
+            const feedsContainer = document.getElementById('feeds-container');
+
+            feedsData.forEach(feed => {  
+                let creator = feed.creator;
+                                
+                let feedTitle = document.createElement('div');
+                let feedDescription = document.createElement('div');
+                let feedCreator = document.createElement('a');
+                feedCreator.textContent = creator.name;
+                console.log(jsonTokenData);
+                if(creator.personId != jsonTokenData.personId) {
+                    feedCreator.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+creator.personId;
+                } else {
+                    feedCreator.href = '/mywebapp/userpage.html';
+                }
+                feedTitle.textContent = feed.title + " " + feed.createdAt;
+                feedDescription.textContent = feed.description;
+
+                feedsContainer.appendChild(feedCreator);
+                feedsContainer.appendChild(feedTitle);
+                feedsContainer.appendChild(feedDescription);
+            });
+        
+        }
+    </script>
+</body>
+</html>
