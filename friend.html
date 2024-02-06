@@ -40,8 +40,9 @@
 
         const url = 'http://localhost:7070/api/people/'+friendId;
         let chatRef = document.getElementById("chat_reference");
+
         let postsRef = document.getElementById("userposts_reference");
-        postsRef.href = "http://localhost:7070/api/posts?personId="+friendId;
+        postsRef.href = "http://localhost:8080/mywebapp/userposts.html?personId="+friendId;
         getFriend();
 
         function parseJwt(token) {
