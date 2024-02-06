@@ -8,6 +8,7 @@
 <body>
     <h2>Posts:</h2>
     <div id="posts-container"></div>
+    <a id="newpost_reference" href="/mywebapp/newpost.html">Create post</a>
     <a href="/mywebapp/userpage.html">User page</a>
     <script>
         let jwt = readCookie('jwt');
@@ -18,6 +19,12 @@
         }
         const urlParams = new URLSearchParams(window.location.search);
         const personId = urlParams.get('personId');
+
+        if(personId == jsonTokenData.personId) {
+            document.getElementById("newpost_reference").style.display = 'block';
+        } else {
+            document.getElementById("newpost_reference").style.display = 'none';
+        }
 
         getPosts();
 
@@ -56,7 +63,7 @@
             return matches ? decodeURIComponent(matches[1]) : undefined;
         }
 
-        // Build an friends page from friends JSON
+        // Build an posts page from posts JSON
         function createPosts(postsData) {
             const postsContainer = document.getElementById('posts-container');
 

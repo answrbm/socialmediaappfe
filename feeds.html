@@ -65,7 +65,7 @@
                 let feedDescription = document.createElement('div');
                 let feedCreator = document.createElement('a');
                 feedCreator.textContent = creator.name;
-                console.log(jsonTokenData);
+
                 if(creator.personId != jsonTokenData.personId) {
                     feedCreator.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+creator.personId;
                 } else {

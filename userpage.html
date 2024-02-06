@@ -20,6 +20,7 @@
     <a href="/mywebapp/subscribers.html">Subscribers</a>
     <a href="/mywebapp/feeds.html">Feeds</a>
     <a href="/mywebapp/people.html">People</a>
+    <a id="myposts_reference">Posts</a>
     <button type="button" onclick="logout()">Logout</button>
 
     <script>
@@ -34,6 +35,7 @@
         document.getElementById("name").innerHTML = jsonTokenData.name;
         document.getElementById("username").innerHTML = jsonTokenData.username;
         document.getElementById("email").innerHTML = jsonTokenData.email;
+        document.getElementById("myposts_reference").href = "/mywebapp/userposts.html?personId="+jsonTokenData.personId;
 
         function parseJwt(token) {
     		const base64Url = token.split('.')[1];
