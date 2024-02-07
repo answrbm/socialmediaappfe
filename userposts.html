@@ -69,6 +69,8 @@
 
             postsData.forEach(post => {  
                 let creator = post.creator;
+
+                let postContainer = document.createElement('div');
                                 
                 let postTitle = document.createElement('div');
                 let postDescription = document.createElement('div');
@@ -83,9 +85,10 @@
                 postTitle.textContent = post.title + " " + post.createdAt;
                 postDescription.textContent = post.description;
 
-                postsContainer.appendChild(postCreator);
-                postsContainer.appendChild(postTitle);
-                postsContainer.appendChild(postDescription);
+                postContainer.appendChild(postCreator);
+                postContainer.appendChild(postTitle);
+                postContainer.appendChild(postDescription);
+                postsContainer.appendChild(postContainer);
             });
         
         }
