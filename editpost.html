@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post Page</title>
+</head>
+<body>
+    <form id="editpostForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+        <br>
+        <div id="error" style="color:red"></div>
+        <button id="submit-button" type="button">Submit</button>
+    </form>
+    <button type="button" onclick="cancel()">Cancel</button>
+
+    <script>
+        let jwt = readCookie('jwt');
+        let jsonTokenData;
+        if(jwt != undefined) {
+            jsonTokenData = parseJwt(jwt);
+            let currentTime = new Date().getTime();
+            if(jsonTokenData.exp * 1000 <= currentTime) {
+                document.getElementById('error').innerHTML = "Relogin please";
+            }
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('post_id');
+
+        document.getElementById('submit-button').addEventListener('click',editPost);
+
+        async function editPost() {
+            document.getElementById('error').textContent = "";
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            // login
+            const response = await fetch('http://localhost:7070/api/posts/'+postId, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer '+jwt,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, description }),
+            });
+
+            // throw an error if data is invalid
+            if (!response.ok) {
+                const data = await response.json();
+                let errorElem = document.getElementById('error');
+                let parsedError = parseErrorMessage(errorElem,data.message);
+            }
+
+            if(response.ok) {
+                window.location.href = 'http://localhost:8080/mywebapp/userposts.html?personId='+jsonTokenData.personId;
+            }
+        }
+
+        function parseErrorMessage(errElem,errMsg) {
+            let errors = errMsg.split(";");
+            let parsedErrorMessage = "";
+            for(error of errors) {
+                let errElement = document.createElement('div');
+                errElement.textContent = error;
+                errElem.appendChild(errElement);
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse(atob(base64));
+        }
+ 
+        function readCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        function cancel() {
+            console.log(jsonTokenData);
+            window.location.href = 'http://localhost:8080/mywebapp/userposts.html?personId='+jsonTokenData.personId;
+        }
+    </script>
+</body>
+</html>
