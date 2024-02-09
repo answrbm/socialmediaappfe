@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2 id="chat_with"></h2>
     <div id="chat-container"></div>
     <form id="message_form" method="POST">
-        <label for="message">Enter your message:</label>
-        <textarea id="message" name="message" rows="4" cols="50"></textarea>
+        <textarea id="message" name="message" rows="4" cols="50" placeholder="Enter your message"></textarea>
         <br/>
-        <input type="submit" value="Send" onclick="sendMessage()"/>
+        <a onclick="sendMessage()">Send</a>
     </form>
     <a href="/mywebapp/userpage.html">User page</a>
     <script>
@@ -72,15 +72,32 @@
         function createChat(data) {
             const chatContainer = document.getElementById('chat-container');
 
+            let messageCounter = 0;
+
             data.forEach(messageItem => {
+                messageCounter++;
+
+                let chatElementContainer = document.createElement('div');
+                chatElementContainer.setAttribute('class','chat-element')
                                                
+                let senderElement = document.createElement('div');
+                let sentAtElement = document.createElement('div');
+                sentAtElement.setAttribute('id','sent_at');
                 let contentElement = document.createElement('div');   
-                let br = document.createElement('br');            
-                contentElement.textContent = messageItem.sender.name + ": " + messageItem.content + " " + messageItem.sentAt;
+                senderElement.textContent = messageItem.sender.name;
+                sentAtElement.textContent = convertDate(messageItem.sentAt);   
+                contentElement.textContent = messageItem.content;
     
-                chatContainer.appendChild(contentElement);
-                chatContainer.appendChild(br);
+                chatElementContainer.appendChild(senderElement);
+                chatElementContainer.appendChild(sentAtElement);
+                chatElementContainer.appendChild(contentElement);
+
+                chatContainer.appendChild(chatElementContainer);
             });
+
+            if(messageCounter === 0) {
+                chatContainer.textContent = 'No messages';
+            }
         
         }
 
@@ -100,8 +117,25 @@
             });
 
             if(response.ok) {
-                window.location.href = '/mywebapp/chat.html';
+                window.location.href = '/mywebapp/chat.html?friend_id='+friendId+'&user='+friendName;
             }
+        }
+
+        function convertDate(date) {
+            let parsedDate = new Date(date);
+
+            let day = parsedDate.getDate();
+            let month = parsedDate.getMonth()+1;
+            let year = parsedDate.getFullYear();
+            let hour = parsedDate.getHours();
+            let minute = parsedDate.getMinutes();
+
+            if(day < 10) day = "0"+day;
+            if(month < 10) month = "0"+month;
+            if(hour < 10) hour = "0"+hour;
+            if(minute < 10) minute = "0"+minute; 
+
+            return day + "-" + month + "-" + year + " " + hour + ":" + minute;
         }
 
 

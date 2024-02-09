@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>People Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>People:</h2>
@@ -58,9 +59,13 @@
         function createPeople(peopleData) {
             const peopleContainer = document.getElementById('people-container');
 
+            let peopleCounter = 0;
+
             peopleData.forEach(person => {
                 const personContainer = document.createElement('a');
                 if(person.personId != jsonTokenData.personId) {
+
+                    peopleCounter++;
                                 
                     let personElement = document.createElement('div');
                     personElement.textContent = person.name;
@@ -71,6 +76,10 @@
                     peopleContainer.appendChild(personContainer);
                 }
             });
+
+            if(peopleCounter === 0) {
+                personContainer.textContent = "No people";
+            }
         
         }
     </script>

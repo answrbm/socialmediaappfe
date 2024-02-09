@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feeds Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Feeds:</h2>
@@ -60,10 +61,16 @@
 
             feedsData.forEach(feed => {  
                 let creator = feed.creator;
+
+                let feedContainer = document.createElement('div');
+                feedContainer.setAttribute('class','feed-container');
                                 
                 let feedTitle = document.createElement('div');
+                let feedCreatedAt = document.createElement('div');
                 let feedDescription = document.createElement('div');
+                feedDescription.setAttribute('class','description');
                 let feedCreator = document.createElement('a');
+                feedCreator.setAttribute('class','creator');
                 feedCreator.textContent = creator.name;
 
                 if(creator.personId != jsonTokenData.personId) {
@@ -71,14 +78,37 @@
                 } else {
                     feedCreator.href = '/mywebapp/userpage.html';
                 }
-                feedTitle.textContent = feed.title + " " + feed.createdAt;
+                feedTitle.textContent = feed.title;
+
+                feedCreatedAt.textContent = convertDate(feed.createdAt);
+                feedCreatedAt.setAttribute('id','created_at');
                 feedDescription.textContent = feed.description;
 
-                feedsContainer.appendChild(feedCreator);
-                feedsContainer.appendChild(feedTitle);
-                feedsContainer.appendChild(feedDescription);
+                feedContainer.appendChild(feedCreator);
+                feedContainer.appendChild(feedTitle);
+                feedContainer.appendChild(feedCreatedAt);
+                feedContainer.appendChild(feedDescription);
+
+                feedsContainer.appendChild(feedContainer);
             });
         
+        }
+
+        function convertDate(date) {
+            let parsedDate = new Date(date);
+
+            let day = parsedDate.getDate();
+            let month = parsedDate.getMonth()+1;
+            let year = parsedDate.getFullYear();
+            let hour = parsedDate.getHours();
+            let minute = parsedDate.getMinutes();
+
+            if(day < 10) day = "0"+day;
+            if(month < 10) month = "0"+month;
+            if(hour < 10) hour = "0"+hour;
+            if(minute < 10) minute = "0"+minute; 
+
+            return day + "-" + month + "-" + year + " " + hour + ":" + minute;
         }
     </script>
 </body>

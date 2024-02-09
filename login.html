@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Login</h2>
+    <h2>PEOPLE</h2>
     <form id="loginForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -15,9 +16,9 @@
         <input type="password" id="password" name="password" required>
         <br>
         <div id="error" style="color:red"></div>
-        <button type="button" onclick="login()">Login</button>
-        <a href="/mywebapp/registration.html">Registration</a>
+        <a onclick="login()">Log in</a>
     </form>
+    <a href="/mywebapp/registration.html">Sign up</a>
 
     <script>
         let jwt = readCookie('jwt');

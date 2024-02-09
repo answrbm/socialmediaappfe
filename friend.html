@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friend Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Friend:</h2>
     <div id="friend-container"></div>
     <a href="/mywebapp/userpage.html">My page</a>
-    <br/>
     <a id="userposts_reference">User posts</a>
-    <br/>
     <a id="chat_reference">Chat with a user</a>
-    <button id="friendshipButton" onclick="cancelFriendship()">Cancel friendship</button>
-    <button id="subscriptionButton" onclick="cancelSubscription()">Cancel subscription</button>
+    <a id="friendshipButton" onclick="cancelFriendship()">Cancel friendship</a>
+    <a id="subscriptionButton" onclick="cancelSubscription()">Cancel subscription</a>
     <script>
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
@@ -151,8 +150,15 @@
             for (const [key, value] of Object.entries(data)) {
                 if(key !== 'personId') {
                     let friendElement = document.createElement('div');
+                    let friendKeyElement = document.createElement('span');
+                    let friendValueElement = document.createElement('span');
 
-                    friendElement.textContent = capitalizeFirstLetter(key) + ": " + value; 
+                    friendKeyElement.setAttribute('class','key');
+                    friendKeyElement.textContent = capitalizeFirstLetter(key)+": ";
+                    friendValueElement.textContent = value+"\n";
+
+                    friendElement.appendChild(friendKeyElement);
+                    friendElement.appendChild(friendValueElement);
                     friendContainer.appendChild(friendElement);
                 }
             }

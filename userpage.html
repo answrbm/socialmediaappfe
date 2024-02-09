@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>User:</h2>
     <label for=name>Name:</label>
     <span id="name"></span>
     <br/>
@@ -21,18 +21,32 @@
     <a href="/mywebapp/feeds.html">Feeds</a>
     <a href="/mywebapp/people.html">People</a>
     <a id="myposts_reference">Posts</a>
-    <button type="button" onclick="logout()">Logout</button>
+    <a onclick="logout()">Logout</a>
+    <a id="updateButton" onclick='updateProfile()'>Update profile</a>
+    <a id="deleteButton" onclick='showModalWindow()'>Delete profile</a>
+    <div id="modalWindow">
+        <div>Are you sure, you want to delete your profile?</div>
+        <a onclick="deleteProfile()">Yes</a>
+        <br/>
+        <a onclick="closeModalWindow()">No</a>
+    </div>
 
     <script>
+        document.getElementById('modalWindow').style.display = 'none';
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
+            deleteCookie('name');
             window.location.href = '/mywebapp/login.html';
         }
 
         // Inject user data extracted from jwt token
-        document.getElementById("name").innerHTML = jsonTokenData.name;
+        if(readCookie('name') == undefined) {
+            document.getElementById("name").innerHTML = jsonTokenData.name;
+        } else {
+            document.getElementById("name").innerHTML = readCookie('name');
+        }
         document.getElementById("username").innerHTML = jsonTokenData.username;
         document.getElementById("email").innerHTML = jsonTokenData.email;
         document.getElementById("myposts_reference").href = "/mywebapp/userposts.html?personId="+jsonTokenData.personId;
@@ -44,6 +58,7 @@
 		}
 
         function logout() {
+            deleteCookie('name');
             deleteCookie('jwt');
             window.location.href = '/mywebapp/login.html';
         }
@@ -56,6 +71,32 @@
 
         function deleteCookie(name) {
             document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
+
+        function showModalWindow() {
+            document.getElementById('modalWindow').style.display = 'block';
+        }
+
+        function closeModalWindow() {
+            document.getElementById('modalWindow').style.display = 'none';
+        }
+
+        function updateProfile() {
+            window.location.href = 'http://localhost:8080/mywebapp/editprofile.html';
+        }
+
+        async function deleteProfile() {
+            const response = await fetch('http://localhost:7070/api/people/'+jsonTokenData.personId, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer '+jwt,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if(response.ok) {
+                window.location.href = 'http://localhost:8080/mywebapp/login.html';
+            }
         }
 
     </script>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friends Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Friends:</h2>
@@ -59,13 +60,22 @@
             const friendsContainer = document.getElementById('friends-container');
             const subscriptionsContainer = document.getElementById('subscriptions-container');
 
-            friendsData.forEach(friendship => {
+            if(friendsData.length === 0) {
+                friendsContainer.textContent = 'No friends';
+                subscriptionsContainer.textContent = 'No subscriptions';
+            } else {
+                let subscriptionsCounter = 0;
+                let freindsCounter = 0;
+
+                friendsData.forEach(friendship => {
                 let subscriberId = friendship.subscriber.personId;
 
                 let receiver = friendship.receiver;
                 let subscriber = friendship.subscriber;
 
                 if(friendship.friendshipStatus == 'FRIEND') {
+                    freindsCounter++;
+
                     const friendContainer = document.createElement('a');
                                 
                     let friendElement = document.createElement('div');
@@ -81,19 +91,29 @@
                     friendContainer.appendChild(friendElement);
                     friendsContainer.appendChild(friendContainer);
                 } else { 
+
                     const subscriberContainer = document.createElement('a');
                     let subscriberElement = document.createElement('div');
 
                     if(receiver.name !== jsonTokenData.name) {
+                        subscriptionsCounter++;
                         subscriberContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&subscription_id="+friendship.friendshipId;
                         subscriberElement.textContent = receiver.name;
                     }
 
                     subscriberContainer.appendChild(subscriberElement);
                     subscriptionsContainer.appendChild(subscriberContainer);
+                } 
+                });
+
+                if(freindsCounter === 0) {
+                    friendsContainer.textContent = 'No friends';
                 }
-                
-            });
+                console.log(subscriptionsCounter);
+                if(subscriptionsCounter === 0) {
+                    subscriptionsContainer.textContent = 'No subscriptions';
+                }
+            }
         
         }
 

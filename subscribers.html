@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscribers Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Subscribers:</h2>
@@ -58,8 +59,12 @@
         function createSubscribers(friendsData) {
             const subscribersContainer = document.getElementById('subscribers-container');
 
+            let subscribersCounter = 0;
+
             friendsData.forEach(friendship => {
                 if(friendship.friendshipStatus == 'SUBSCRIBER' && friendship.receiver.name == jsonTokenData.name) {
+                    subscribersCounter++;
+
                     const subscriberContainer = document.createElement('a');
                     let subscriber = friendship.subscriber;
                                 
@@ -73,6 +78,10 @@
                     subscribersContainer.appendChild(subscriberContainer);
                 }
             });
+
+            if(subscribersCounter === 0) {
+                subscribersContainer.textContent = "No subscribers";
+            }
         }
 
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Person Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Person:</h2>
@@ -15,14 +16,11 @@
     <br/>
     <label for="email">Email:</label>
     <span id="email"></span>
-    <br/>
-    <button id="subscriptionButton" onclick="subscribe()">Subscribe</button>
-    <button id="acceptFriendshipButton" onclick="acceptFriendship()">Accept friendship</button>
-    <button id="cancelFriendshipButton" onclick="cancelFriendshipOrSubscription()">Cancel friendship</button>
-    <button id="cancelSubscriptionButton" onclick="cancelFriendshipOrSubscription()">Cancel subscription</button>
-    <br/>
+    <a id="subscriptionButton" onclick="subscribe()">Subscribe</a>
+    <a id="acceptFriendshipButton" onclick="acceptFriendship()">Accept friendship</a>
+    <a id="cancelFriendshipButton" onclick="cancelFriendshipOrSubscription()">Cancel friendship</a>
+    <a id="cancelSubscriptionButton" onclick="cancelFriendshipOrSubscription()">Cancel subscription</a>
     <a id="userposts_reference">User posts</a>
-    <br/>
     <a href="/mywebapp/userpage.html">User page</a>
 
     <script>

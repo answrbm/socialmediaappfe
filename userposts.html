@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users posts page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h2>Posts:</h2>
@@ -74,22 +75,30 @@
                 postId = post.postId;
 
                 let postContainer = document.createElement('div');
+                postContainer.setAttribute('class','post-container');
                                 
                 let postTitle = document.createElement('div');
+                let postCreatedAt = document.createElement('div');
                 let postDescription = document.createElement('div');
+                postDescription.setAttribute('class','description');
                 let postCreator = document.createElement('a');
                 postCreator.textContent = creator.name;
+                postCreator.setAttribute('class','creator');
                 
                 if(creator.personId != jsonTokenData.personId) {
                     postCreator.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+creator.personId;
                 } else {
                     postCreator.href = '/mywebapp/userpage.html';
                 }
-                postTitle.textContent = post.title + " " + post.createdAt;
+                postTitle.textContent = post.title
+
+                postCreatedAt.textContent = convertDate(post.createdAt);
+                postCreatedAt.setAttribute('id','created_at');
                 postDescription.textContent = post.description;
 
                 postContainer.appendChild(postCreator);
                 postContainer.appendChild(postTitle);
+                postContainer.appendChild(postCreatedAt);
                 postContainer.appendChild(postDescription);
                 postsContainer.appendChild(postContainer);
 
@@ -97,16 +106,37 @@
                     let postEdit = document.createElement('a');
                     postEdit.textContent = 'Edit';
                     postEdit.href = 'http://localhost:8080/mywebapp/editpost.html?post_id='+postId;
-                    let postDelete = document.createElement('button');
+                    let postDelete = document.createElement('a');
+                    postDelete.setAttribute('class','deleteButton');
                     postDelete.textContent = 'Delete';
                     postDelete.addEventListener('click',deletePost);
 
                     postContainer.appendChild(postEdit);
-                    postContainer.appendChild(document.createElement('br'));
                     postContainer.appendChild(postDelete);
                 }
             });
+
+            if(postsData.length === 0) {
+                postsContainer.textContent = "No posts";
+            }
         
+        }
+
+        function convertDate(date) {
+            let parsedDate = new Date(date);
+
+            let day = parsedDate.getDate();
+            let month = parsedDate.getMonth()+1;
+            let year = parsedDate.getFullYear();
+            let hour = parsedDate.getHours();
+            let minute = parsedDate.getMinutes();
+
+            if(day < 10) day = "0"+day;
+            if(month < 10) month = "0"+month;
+            if(hour < 10) hour = "0"+hour;
+            if(minute < 10) minute = "0"+minute; 
+
+            return day + "-" + month + "-" + year + " " + hour + ":" + minute;
         }
 
         async function deletePost() {

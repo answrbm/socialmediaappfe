@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Protest+Strike&display=swap');
+
+body {
+    font-family: 'Protest Strike', sans-serif;
+    text-align: center;
+    background-color: #D4F1F4;
+    color: #189AB4;
+}
+
+h2 {
+    color: #05445E;
+}
+
+a {
+    display: block;
+    width: 15%;
+    text-decoration: none;
+    color: #189AB4;
+    background-color: #75E6DA;
+    margin: 10px auto;
+    border-radius: 6%;
+    cursor: pointer;
+}
+
+a:hover {
+    color: white;
+}
+
+form input, form textarea {
+    border: none;
+    border-radius: 6%;
+    margin: 10px auto;
+    outline: none;
+    color: #05445E;
+}
+
+label, .key {
+    color: #05445E;
+}
+
+#friends-container a, #subscriptions-container a, 
+#feeds-container .creator, #posts-container .creator,
+#people-container a, #subscribers-container a {
+    background-color: #05445E;
+    color: white;
+}
+
+#friends-container a:hover, #subscriptions-container a:hover, 
+#feeds-container .creator:hover, #posts-container .creator:hover,
+#people-container a:hover, #subscribers-container a:hover {
+    color: #189AB4;
+}
+
+#friendshipButton, #subscriptionButton, #cancelFriendshipButton, #cancelSubscriptionButton, #deleteButton {
+    color: #FB8DA0;
+}
+
+#friendshipButton:hover, #subscriptionButton:hover, #cancelFriendshipButton:hover, #cancelSubscriptionButton:hover, #deleteButton:hover {
+    color: red;
+}
+
+#acceptFriendshipButton {
+    color: #18A558;
+}
+
+#acceptFriendshipButton:hover {
+    color: #116530;
+}
+
+#posts-container .post-container, #feeds-container .feed-container, #chat-container .chat-element {
+    margin: 1% auto;
+    border: 1px solid #75E6DA;
+    border-radius: 2%;
+    padding: 2% auto;
+    width: 20%;
+}
+
+.post-container *, .feed-container *, .chat-element * {
+    overflow-wrap: break-word;
+    margin: 2% auto;
+}
+
+.post-container a, .feed-container a {
+    width: 90%;
+}
+
+.description {
+    margin: auto 2%;
+}
+
+#created_at, #sent_at {
+    color: #05445E;
+}
