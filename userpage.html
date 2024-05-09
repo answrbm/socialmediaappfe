@@ -16,10 +16,10 @@
     <label for="email">Email:</label>
     <span id="email"></span>
     <br/>
-    <a href="/mywebapp/friends.html">Friends</a>
-    <a href="/mywebapp/subscribers.html">Subscribers</a>
-    <a href="/mywebapp/feeds.html">Feeds</a>
-    <a href="/mywebapp/people.html">People</a>
+    <a href="/friends.html">Friends</a>
+    <a href="/subscribers.html">Subscribers</a>
+    <a href="/feeds.html">Feeds</a>
+    <a href="/people.html">People</a>
     <a id="myposts_reference">Posts</a>
     <a onclick="logout()">Logout</a>
     <a id="updateButton" onclick='updateProfile()'>Update profile</a>
@@ -38,7 +38,7 @@
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
             deleteCookie('name');
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
 
         // Inject user data extracted from jwt token
@@ -49,7 +49,7 @@
         }
         document.getElementById("username").innerHTML = jsonTokenData.username;
         document.getElementById("email").innerHTML = jsonTokenData.email;
-        document.getElementById("myposts_reference").href = "/mywebapp/userposts.html?personId="+jsonTokenData.personId;
+        document.getElementById("myposts_reference").href = "/userposts.html?personId="+jsonTokenData.personId;
 
         function parseJwt(token) {
     		const base64Url = token.split('.')[1];
@@ -60,7 +60,7 @@
         function logout() {
             deleteCookie('name');
             deleteCookie('jwt');
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
 
         function readCookie(name) {
@@ -82,11 +82,11 @@
         }
 
         function updateProfile() {
-            window.location.href = 'http://localhost:8080/mywebapp/editprofile.html';
+            window.location.href = 'https://socialmediaappfe.vercel.app/editprofile.html';
         }
 
         async function deleteProfile() {
-            const response = await fetch('http://localhost:7070/api/people/'+jsonTokenData.personId, {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/people/'+jsonTokenData.personId, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': 'Bearer '+jwt,
@@ -95,7 +95,7 @@
             });
 
             if(response.ok) {
-                window.location.href = 'http://localhost:8080/mywebapp/login.html';
+                window.location.href = 'https://socialmediaappfe.vercel.app/login.html';
             }
         }
 

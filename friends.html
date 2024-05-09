@@ -11,17 +11,17 @@
     <div id="friends-container"></div>
     <h2>Subscriptions:</h2>
     <div id="subscriptions-container"></div>
-    <a href="/mywebapp/userpage.html">User page</a>
+    <a href="/userpage.html">User page</a>
     <script>
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
 
         async function getFriends() {
-            const response = await fetch('http://localhost:7070/api/friendships', {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/friendships', {
                 method: 'GET',
                 headers: {
                     'Authorization' : 'Bearer '+jwt,
@@ -82,10 +82,10 @@
 
                     // check if current user is a subscriber or receiver of friendship                
                     if(receiver.name !== jsonTokenData.name) {
-                        friendContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&friendship_id="+friendship.friendshipId;
+                        friendContainer.href = 'https://socialmediaappfe.vercel.app/friend.html?friend_id='+receiver.personId+"&friendship_id="+friendship.friendshipId;
                         friendElement.textContent = receiver.name;
                     } else {
-                        friendContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+subscriber.personId+"&friendship_id="+friendship.friendshipId;
+                        friendContainer.href = 'https://socialmediaappfe.vercel.app/friend.html?friend_id='+subscriber.personId+"&friendship_id="+friendship.friendshipId;
                         friendElement.textContent = subscriber.name;
                     }
                     friendContainer.appendChild(friendElement);
@@ -97,7 +97,7 @@
 
                     if(receiver.name !== jsonTokenData.name) {
                         subscriptionsCounter++;
-                        subscriberContainer.href = 'http://localhost:8080/mywebapp/friend.html?friend_id='+receiver.personId+"&subscription_id="+friendship.friendshipId;
+                        subscriberContainer.href = 'https://socialmediaappfe.vercel.app/friend.html?friend_id='+receiver.personId+"&subscription_id="+friendship.friendshipId;
                         subscriberElement.textContent = receiver.name;
                     }
 

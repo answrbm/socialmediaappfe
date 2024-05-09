@@ -14,15 +14,15 @@
         <br/>
         <a onclick="sendMessage()">Send</a>
     </form>
-    <a href="/mywebapp/userpage.html">User page</a>
+    <a href="/userpage.html">User page</a>
     <script>
         // Получение параметра "tag" из URL
         const urlParams = new URLSearchParams(window.location.search);
         const friendId = urlParams.get('friend_id');
         const friendName = urlParams.get('user');
-        const urlChat = 'http://localhost:7070/api/messages/chat?personId='+friendId;
+        const urlChat = 'https://socialmediaapp-production.up.railway.app/api/messages/chat?personId='+friendId;
         document.getElementById('chat_with').textContent = "Chat with " + friendName;
-        const urlForm = "http://localhost:7070/api/messages?personId="+friendId;
+        const urlForm = "https://socialmediaapp-production.up.railway.app/api/messages?personId="+friendId;
 
         getMessages();
 
@@ -117,7 +117,7 @@
             });
 
             if(response.ok) {
-                window.location.href = '/mywebapp/chat.html?friend_id='+friendId+'&user='+friendName;
+                window.location.href = '/chat.html?friend_id='+friendId+'&user='+friendName;
             }
         }
 

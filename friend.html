@@ -9,7 +9,7 @@
 <body>
     <h2>Friend:</h2>
     <div id="friend-container"></div>
-    <a href="/mywebapp/userpage.html">My page</a>
+    <a href="/userpage.html">My page</a>
     <a id="userposts_reference">User posts</a>
     <a id="chat_reference">Chat with a user</a>
     <a id="friendshipButton" onclick="cancelFriendship()">Cancel friendship</a>
@@ -19,7 +19,7 @@
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
         // Получение параметра "tag" из URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -37,11 +37,11 @@
             subscriptionButton.style.display = 'block';
         }
 
-        const url = 'http://localhost:7070/api/people/'+friendId;
+        const url = 'https://socialmediaapp-production.up.railway.app/api/people/'+friendId;
         let chatRef = document.getElementById("chat_reference");
 
         let postsRef = document.getElementById("userposts_reference");
-        postsRef.href = "http://localhost:8080/mywebapp/userposts.html?personId="+friendId;
+        postsRef.href = "https://socialmediaappfe.vercel.app/userposts.html?personId="+friendId;
         getFriend();
 
         function parseJwt(token) {
@@ -71,7 +71,7 @@
             .then(data => {
                 let friendData = data;
                 buildFriend(friendData);
-                chatRef.href = "/mywebapp/chat.html?friend_id="+friendId+"&user="+friendData.name;
+                chatRef.href = "/chat.html?friend_id="+friendId+"&user="+friendData.name;
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -84,7 +84,7 @@
         }
 
         async function cancelFriendship() {
-            let url = 'http://localhost:7070/api/friendships?friendshipId=';
+            let url = 'https://socialmediaapp-production.up.railway.app/api/friendships?friendshipId=';
             if(friendshipId != undefined) {
                 url += friendshipId;
             } else {
@@ -101,13 +101,13 @@
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 } else {
-                    window.location.href = '/mywebapp/subscribers.html';
+                    window.location.href = '/subscribers.html';
                 }
             });
         }
 
         async function cancelSubscription() {
-            let url = 'http://localhost:7070/api/friendships?friendshipId=';
+            let url = 'https://socialmediaapp-production.up.railway.app/api/friendships?friendshipId=';
             if(friendshipId != undefined) {
                 url += friendshipId;
             } else {
@@ -124,7 +124,7 @@
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 } else {
-                    window.location.href = '/mywebapp/friends.html';
+                    window.location.href = '/friends.html';
                 }
             });
         }

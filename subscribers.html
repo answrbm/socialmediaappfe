@@ -9,19 +9,19 @@
 <body>
     <h2>Subscribers:</h2>
     <div id="subscribers-container"></div>
-    <a href="/mywebapp/userpage.html">User page</a>
+    <a href="/userpage.html">User page</a>
     <script>
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
 
         getSubscribers();
 
         async function getSubscribers() {
-            const response = await fetch('http://localhost:7070/api/friendships', {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/friendships', {
                 method: 'GET',
                 headers: {
                     'Authorization' : 'Bearer '+jwt,
@@ -70,7 +70,7 @@
                                 
                     let subscriberElement = document.createElement('div');
               
-                    subscriberContainer.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+subscriber.personId+
+                    subscriberContainer.href = 'https://socialmediaappfe.vercel.app/personpage.html?person_id='+subscriber.personId+
                     "&subscription_id="+friendship.friendshipId;
                     subscriberElement.textContent = subscriber.name;
 

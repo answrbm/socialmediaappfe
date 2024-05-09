@@ -9,14 +9,14 @@
 <body>
     <h2>Posts:</h2>
     <div id="posts-container"></div>
-    <a id="newpost_reference" href="/mywebapp/newpost.html">Create post</a>
-    <a href="/mywebapp/userpage.html">User page</a>
+    <a id="newpost_reference" href="/newpost.html">Create post</a>
+    <a href="/userpage.html">User page</a>
     <script>
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
         const urlParams = new URLSearchParams(window.location.search);
         const personId = urlParams.get('personId');
@@ -31,7 +31,7 @@
         getPosts();
 
         async function getPosts() {
-            const response = await fetch('http://localhost:7070/api/posts/'+personId, {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/posts/'+personId, {
                 method: 'GET',
                 headers: {
                     'Authorization' : 'Bearer '+jwt,
@@ -86,9 +86,9 @@
                 postCreator.setAttribute('class','creator');
                 
                 if(creator.personId != jsonTokenData.personId) {
-                    postCreator.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+creator.personId;
+                    postCreator.href = 'https://socialmediaappfe.vercel.app/personpage.html?person_id='+creator.personId;
                 } else {
-                    postCreator.href = '/mywebapp/userpage.html';
+                    postCreator.href = '/userpage.html';
                 }
                 postTitle.textContent = post.title
 
@@ -105,7 +105,7 @@
                 if(creator.personId == jsonTokenData.personId) {
                     let postEdit = document.createElement('a');
                     postEdit.textContent = 'Edit';
-                    postEdit.href = 'http://localhost:8080/mywebapp/editpost.html?post_id='+postId;
+                    postEdit.href = 'https://socialmediaappfe.vercel.app/editpost.html?post_id='+postId;
                     let postDelete = document.createElement('a');
                     postDelete.setAttribute('class','deleteButton');
                     postDelete.textContent = 'Delete';
@@ -140,7 +140,7 @@
         }
 
         async function deletePost() {
-            const response = await fetch('http://localhost:7070/api/posts/'+postId, {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/posts/'+postId, {
                 method: 'DELETE',
                 headers: {
                     'Authorization' : 'Bearer '+jwt,
@@ -158,7 +158,7 @@
             });
 
             if(response.ok) {
-                window.location.href = 'http://localhost:8080/mywebapp/userposts.html?personId='+jsonTokenData.personId;
+                window.location.href = 'https://socialmediaappfe.vercel.app/userposts.html?personId='+jsonTokenData.personId;
             }
         }
 

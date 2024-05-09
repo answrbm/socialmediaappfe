@@ -9,19 +9,19 @@
 <body>
     <h2>People:</h2>
     <div id="people-container"></div>
-    <a href="/mywebapp/userpage.html">User page</a>
+    <a href="/userpage.html">User page</a>
     <script>
         let jwt = readCookie('jwt');
         const jsonTokenData = parseJwt(jwt);
         let currentTime = new Date().getTime();
         if(jsonTokenData.exp * 1000 <= currentTime) {
-            window.location.href = '/mywebapp/login.html';
+            window.location.href = '/login.html';
         }
 
         getPeople();
 
         async function getPeople() {
-            const response = await fetch('http://localhost:7070/api/people', {
+            const response = await fetch('https://socialmediaapp-production.up.railway.app/api/people', {
                 method: 'GET',
                 headers: {
                     'Authorization' : 'Bearer '+jwt,
@@ -70,7 +70,7 @@
                     let personElement = document.createElement('div');
                     personElement.textContent = person.name;
 
-                    personContainer.href = 'http://localhost:8080/mywebapp/personpage.html?person_id='+person.personId;
+                    personContainer.href = 'https://socialmediaappfe.vercel.app/personpage.html?person_id='+person.personId;
 
                     personContainer.appendChild(personElement);
                     peopleContainer.appendChild(personContainer);
